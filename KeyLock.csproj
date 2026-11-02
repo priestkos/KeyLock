@@ -17,6 +17,7 @@
     <Description>One command rebinds the game's own movement keybinds to the arrow keys and clears the Space binding from Jump, so typing in chat can never move the character by accident. Running it again restores exactly the binds it replaced; the original keybinds are saved in the plugin configuration so a restore still works after the client restarts.</Description>
     <Tags>keybind;movement;chat;input;utility</Tags>
     <RepoUrl>https://github.com/priestkos/KeyLock</RepoUrl>
+    <IconUrl>https://raw.githubusercontent.com/priestkos/KeyLock/main/images/icon.png</IconUrl>
   </PropertyGroup>
 
   <!-- tests/ holds the standalone offline harness; it must never be compiled into the plugin. -->

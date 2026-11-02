@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mock-up: Chat commands</title>
+    <link rel="stylesheet" href="common.css" />
+  </head>
+  <body>
+    <div class="game-backdrop"></div>
+    <div class="duty-title">Any territory · MOCK SCENE</div>
+    <div class="mockup-banner">Mock-up</div>
+    <div class="scene-label">/keylock toggle, on, off, restore, and status read-back</div>
+
+    <div class="chat-panel">
+      <div class="chat-line echo">&gt; /keylock</div>
+      <div class="chat-line plugin">[KeyLock] swapped 5 keybind(s): movement is on the arrow keys, Jump has no key. /keylock off restores.</div>
+      <div class="chat-line echo">&gt; /keylock status</div>
+      <div class="chat-line plugin">[KeyLock] swapped, 5 saved bind(s):</div>
+      <div class="chat-line plugin-dim">  MOVE_FORE        Up / unbound</div>
+      <div class="chat-line plugin-dim">  MOVE_BACK        Down / unbound</div>
+      <div class="chat-line plugin-dim">  MOVE_LEFT        Left / unbound</div>
+      <div class="chat-line plugin-dim">  MOVE_RIGHT       Right / unbound</div>
+      <div class="chat-line plugin-dim">  JUMP             unbound / unbound</div>
+      <div class="chat-line echo">&gt; /keylock off</div>
+      <div class="chat-line plugin">[KeyLock] restored 5 keybind(s).</div>
+      <div class="chat-line echo">&gt; /keylock help</div>
+      <div class="chat-line plugin">[KeyLock] /keylock [on|off|restore|status]</div>
+    </div>
+    <div class="chat-input-hint">Illustrative chat lines — not a real client log</div>
+
+    <div class="callout" style="top: 100px; right: 48px">
+      Bare <strong>/keylock</strong> swaps or restores depending on <code>Swapped</code>.<br />
+      <strong>status</strong> prints the eight managed inputs from the live keybind table.<br />
+      Unknown args print usage only — no chat echo for <strong>on</strong>/<strong>off</strong>.
+    </div>
+  </body>
+</html>

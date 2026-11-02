@@ -1,9 +1,30 @@
 # KeyLock
 
+<img src="images/icon.png" width="96">
+
 Moves FFXIV's movement keys off WASD and jump off Space with one command, and puts them back exactly as
 they were — so typing in chat can never walk you into a wall.
 
 `/keylock` · Dalamud API 15 · .NET 10
+
+## Screenshots
+
+These images are **mock-ups** (HTML rendered to PNG). They are not real in-game captures and do not show the actual FFXIV client UI.
+
+| | |
+| --- | --- |
+| ![Config state mock-up](docs/screenshots/01-config-state.png) | **Saved configuration** — no settings window; `Swapped` and saved original keybind bytes live in `pluginConfigs/KeyLock.json`. |
+| ![Chat typing mock-up](docs/screenshots/02-chat-typing.png) | **Why swap** — with default WASD binds, typing those letters in chat can still move the character (the plugin rebinds the table; it does not block keys). |
+| ![Keybinds before mock-up](docs/screenshots/03-keybinds-before.png) | **Before `/keylock`** — illustrative Keybinds excerpt with W/A/S/D and Space on movement and Jump. |
+| ![Keybinds after mock-up](docs/screenshots/04-keybinds-after.png) | **After `/keylock`** — movement on arrow keys, Jump unbound; Q/E strafes unchanged. |
+| ![Chat commands mock-up](docs/screenshots/05-chat-commands.png) | **Commands** — toggle swap/restore, `/keylock status` read-back for the eight managed inputs, usage text for unknown args. |
+
+## Mock-up video
+
+A short **mock-up** walkthrough (not real gameplay) cross-fades through the same scenes with on-screen captions. The gold **Mock-up** label stays visible for the whole clip.
+
+- [mockup-walkthrough.mp4](docs/videos/mockup-walkthrough.mp4) (H.264, 1280×720, ~18 s)
+- [mockup-walkthrough.gif](docs/videos/mockup-walkthrough.gif) (preview)
 
 ## What it does
 
@@ -40,6 +61,32 @@ Because it is a table write and not input interception, there is no per-frame wo
 signature of this plugin's own to break on a game patch. A layout guard refuses to write if
 `sizeof(Keybind)` ever stops being 11.
 
+## Install
+
+Add this custom plugin repository in Dalamud's plugin installer:
+
+```
+https://raw.githubusercontent.com/priestkos/PlogonYes/main/pluginmaster.json
+```
+
+Then install **KeyLock** from the list and enable it in `/xlplugins`.
+
+## Building
+
+Requires the .NET 10 SDK and the Dalamud dev distribution
+(`%APPDATA%\XIVLauncher\addon\Hooks\dev`, or `DALAMUD_HOME`).
+
+```
+dotnet build KeyLock.csproj -c Debug      # load bin/Debug/KeyLock.dll as a dev plugin
+dotnet build KeyLock.csproj -c Release    # zip in bin/Release/KeyLock/latest.zip
+```
+
+## Releases
+
+Pushes to `main` that change the plugin (not docs-only paths ignored by the release workflow) cut a
+GitHub release automatically. The version is the next four-part number above the latest release tag, or
+the csproj version when that is higher.
+
 ## Commands
 
 | Command | Effect |
@@ -54,16 +101,6 @@ signature of this plugin's own to break on a game patch. A layout guard refuses 
 
 No window and no settings page. The plugin's entire state is the Dalamud config file
 `pluginConfigs/KeyLock.json`: whether the binds are currently swapped, and the saved originals.
-
-## Build
-
-Requires the .NET 10 SDK and the Dalamud dev distribution
-(`%APPDATA%\XIVLauncher\addon\Hooks\dev`, or `DALAMUD_HOME`).
-
-```
-dotnet build -c Debug      # load bin/Debug/KeyLock.dll as a dev plugin
-dotnet build -c Release    # zip in bin/Release/KeyLock/latest.zip
-```
 
 ## Install (dev plugin)
 
@@ -104,4 +141,6 @@ KeyMap.cs        the whole decision: which key becomes which, pure and Dalamud-f
 Configuration.cs whether the binds are swapped, plus the saved originals
 tests/           offline harness over KeyMap.cs
 .github/         build (artifact + offline checks) and release workflows
+docs/            mock-up screenshots and walkthrough video (not real captures)
+images/          plugin icon
 ```

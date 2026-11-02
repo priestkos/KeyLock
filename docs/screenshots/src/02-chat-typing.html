@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mock-up: Typing in chat</title>
+    <link rel="stylesheet" href="common.css" />
+    <style>
+      .movement-hint {
+        position: absolute;
+        top: 200px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 13px;
+        color: #e8a0a0;
+        text-align: center;
+        max-width: 420px;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-backdrop"></div>
+    <div class="duty-title">Any territory · MOCK SCENE</div>
+    <div class="mockup-banner">Mock-up</div>
+    <div class="scene-label">Why swap — movement keys still type in chat (plugin does not block keys)</div>
+
+    <div class="movement-hint">
+      Illustrative scene: with default WASD binds, letters in chat can still move the character.
+      KeyLock rebinds the game's movement table instead of intercepting input.
+    </div>
+
+    <div class="chat-box">hello worl<span class="caret"></span></div>
+
+    <div class="key-hint" style="top: 320px; left: 380px">W pressed</div>
+    <div class="key-hint" style="top: 360px; left: 420px; opacity: 0.85">character walks forward</div>
+
+    <div class="callout" style="bottom: 140px; right: 48px">
+      <strong>/keylock</strong> moves Move Forward/Back/Left/Right to the arrow keys and clears Jump's
+      Space bind — typing W/A/S/D no longer walks you.
+    </div>
+  </body>
+</html>

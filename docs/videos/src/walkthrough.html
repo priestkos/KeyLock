@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>KeyLock mock-up walkthrough</title>
+    <link rel="stylesheet" href="../../screenshots/src/common.css" />
+    <style>
+      body {
+        position: relative;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+        will-change: transform, opacity;
+      }
+
+      .video-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 9000;
+        padding: 14px 20px;
+        font-size: 15px;
+        font-weight: 600;
+        text-align: center;
+        color: #fff;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.5) 70%, transparent 100%);
+        text-shadow: 0 1px 4px #000;
+      }
+
+      .mockup-banner {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+
+      .s1 .config-panel {
+        top: 120px;
+        left: 72px;
+      }
+      .s2 .chat-box {
+        bottom: 200px;
+      }
+      .s3 .keybinds-window,
+      .s4 .keybinds-window {
+        top: 100px;
+        right: 64px;
+      }
+      .s5 .chat-panel {
+        top: 140px;
+        bottom: auto;
+        max-height: none;
+      }
+
+      .chat-line {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      .swap-flash {
+        position: absolute;
+        inset: 0;
+        background: rgba(90, 159, 212, 0.15);
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mockup-banner">Mock-up</div>
+
+    <div id="scene1" class="scene s1">
+      <div class="game-backdrop"></div>
+      <div class="duty-title">Configuration · MOCK SCENE</div>
+      <div class="config-panel">
+        <div class="config-title">KeyLock — saved configuration</div>
+        <div class="config-body">
+          <p>No settings window — <code>Swapped</code> and <code>OriginalBinds</code> live in KeyLock.json.</p>
+          <div class="json-block" id="s1-json">{
+  "Version": 1,
+  "Swapped": false,
+  "OriginalBinds": { }
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="scene2" class="scene s2">
+      <div class="game-backdrop"></div>
+      <div class="duty-title">Chat · MOCK SCENE</div>
+      <div class="chat-box" id="s2-chat">typing wasd in chat<span class="caret"></span></div>
+    </div>
+
+    <div id="scene3" class="scene s3">
+      <div class="game-backdrop"></div>
+      <div class="duty-title">Keybinds · before</div>
+      <div class="keybinds-window">
+        <div class="keybinds-title">Keybinds — Movement</div>
+        <table class="keybinds-table">
+          <tr><td>Move Forward</td><td class="key">W</td><td class="key">unbound</td></tr>
+          <tr><td>Jump</td><td class="key">Space</td><td class="key">unbound</td></tr>
+        </table>
+      </div>
+      <div class="swap-flash" id="s3-flash"></div>
+    </div>
+
+    <div id="scene4" class="scene s4">
+      <div class="game-backdrop"></div>
+      <div class="duty-title">Keybinds · after /keylock</div>
+      <div class="keybinds-window">
+        <div class="keybinds-title">Keybinds — Movement</div>
+        <table class="keybinds-table">
+          <tr class="changed"><td>Move Forward</td><td class="key">Up</td><td class="key">unbound</td></tr>
+          <tr class="changed"><td>Jump</td><td class="key">unbound</td><td class="key">unbound</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div id="scene5" class="scene s5">
+      <div class="game-backdrop"></div>
+      <div class="duty-title">Commands · MOCK SCENE</div>
+      <div class="chat-panel" id="s5-chat">
+        <div class="chat-line echo" data-at="13.0">&gt; /keylock status</div>
+        <div class="chat-line plugin" data-at="13.3">[KeyLock] swapped, 5 saved bind(s):</div>
+        <div class="chat-line plugin-dim" data-at="13.55">  MOVE_FORE        Up / unbound</div>
+        <div class="chat-line echo" data-at="14.2">&gt; /keylock off</div>
+        <div class="chat-line plugin" data-at="14.5">[KeyLock] restored 5 keybind(s).</div>
+      </div>
+    </div>
+
+    <div class="video-caption" id="caption">KeyLock — mock-up walkthrough</div>
+
+    <script>
+      const scenes = [
+        { id: "scene1", start: 0, end: 3.6, caption: "Saved config — Swapped flag and original bind snapshots" },
+        { id: "scene2", start: 3.2, end: 6.8, caption: "Problem — WASD still move you while typing in chat" },
+        { id: "scene3", start: 6.4, end: 9.6, caption: "Before swap — default W / Space movement binds" },
+        { id: "scene4", start: 9.2, end: 12.8, caption: "After /keylock — arrow keys and Jump unbound" },
+        { id: "scene5", start: 12.4, end: 18.0, caption: "/keylock status and /keylock off in chat" },
+      ];
+
+      function easeOutCubic(x) {
+        return 1 - Math.pow(1 - x, 3);
+      }
+
+      function clamp(v, lo, hi) {
+        return Math.min(hi, Math.max(lo, v));
+      }
+
+      function sceneMotion(t, start, end) {
+        const fade = 0.45;
+        let opacity = 0;
+        let ty = 12;
+        if (t < start) {
+          opacity = 0;
+          ty = 12;
+        } else if (t > end) {
+          opacity = 0;
+          ty = -8;
+        } else if (t < start + fade) {
+          const p = (t - start) / fade;
+          const e = easeOutCubic(p);
+          opacity = e;
+          ty = 12 * (1 - e);
+        } else if (t > end - fade) {
+          const p = (end - t) / fade;
+          const e = easeOutCubic(p);
+          opacity = e;
+          ty = -8 * (1 - e);
+        } else {
+          opacity = 1;
+          ty = 0;
+        }
+        return { opacity, ty };
+      }
+
+      window.seekWalkthrough = function (t) {
+        for (const s of scenes) {
+          const el = document.getElementById(s.id);
+          const { opacity, ty } = sceneMotion(t, s.start, s.end);
+          el.style.opacity = String(opacity);
+          el.style.transform = `translateY(${ty}px)`;
+        }
+
+        let cap = "KeyLock — mock-up walkthrough";
+        for (const s of scenes) {
+          if (t >= s.start && t <= s.end) cap = s.caption;
+        }
+        document.getElementById("caption").textContent = cap;
+
+        const s1 = sceneMotion(t, scenes[0].start, scenes[0].end).opacity;
+        if (s1 > 0.05 && t >= 1.2) {
+          document.getElementById("s1-json").textContent = `{
+  "Version": 1,
+  "Swapped": true,
+  "OriginalBinds": { "321": "…", "348": "…" }
+}`;
+        }
+
+        const s3 = sceneMotion(t, scenes[2].start, scenes[2].end).opacity;
+        const flash = document.getElementById("s3-flash");
+        if (s3 > 0.05 && t >= 8.8 && t <= 9.4) {
+          flash.style.opacity = String(0.35 * (1 - Math.abs(t - 9.1) / 0.3));
+        } else {
+          flash.style.opacity = "0";
+        }
+
+        const s5 = sceneMotion(t, scenes[4].start, scenes[4].end).opacity;
+        if (s5 > 0.05) {
+          const lines = document.querySelectorAll("#s5-chat .chat-line");
+          for (const line of lines) {
+            const at = parseFloat(line.getAttribute("data-at"));
+            const p = clamp((t - at) / 0.25, 0, 1);
+            const e = easeOutCubic(p);
+            line.style.opacity = String(e);
+            line.style.transform = `translateY(${6 * (1 - e)}px)`;
+          }
+        }
+      };
+
+      seekWalkthrough(0);
+    </script>
+  </body>
+</html>

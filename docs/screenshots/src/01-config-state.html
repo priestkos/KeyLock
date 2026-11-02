@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mock-up: Plugin configuration</title>
+    <link rel="stylesheet" href="common.css" />
+  </head>
+  <body>
+    <div class="game-backdrop"></div>
+    <div class="duty-title">Open world · MOCK SCENE</div>
+    <div class="mockup-banner">Mock-up</div>
+    <div class="scene-label">No settings window — state is saved in pluginConfigs/KeyLock.json</div>
+
+    <div class="config-panel">
+      <div class="config-title">KeyLock — saved configuration</div>
+      <div class="config-body">
+        <p>
+          There is no in-game settings UI. The plugin stores whether the binds are swapped and the
+          original 11-byte keybind snapshots in <code>pluginConfigs/KeyLock.json</code>.
+        </p>
+        <div class="json-block">{
+  "Version": 1,
+  "Swapped": true,
+  "OriginalBinds": {
+    "321": "…11 bytes (MOVE_FORE was W)…",
+    "322": "…MOVE_BACK was S…",
+    "323": "…MOVE_LEFT was A…",
+    "324": "…MOVE_RIGHT was D…",
+    "348": "…JUMP was Space…"
+  }
+}</div>
+        <p style="margin-top: 12px; font-size: 12px; color: #888">
+          After <strong>/keylock off</strong>, <code>Swapped</code> becomes false and
+          <code>OriginalBinds</code> is cleared.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout" style="top: 140px; right: 64px">
+      On load, if <strong>Swapped</strong> is still true, the plugin logs a warning — run
+      <strong>/keylock off</strong> to restore.
+    </div>
+  </body>
+</html>

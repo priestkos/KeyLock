@@ -1,0 +1,28 @@
+<Project Sdk="Dalamud.NET.Sdk/15.0.0">
+
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>KeyLock</AssemblyName>
+    <RootNamespace>KeyLock</RootNamespace>
+
+    <Author>PriestKos</Author>
+    <Authors>PriestKos</Authors>
+    <Name>KeyLock</Name>
+    <Punchline>Moves movement off WASD and jump off Space on demand, and puts them back.</Punchline>
+    <Description>One command rebinds the game's own movement keybinds to the arrow keys and clears the Space binding from Jump, so typing in chat can never move the character by accident. Running it again restores exactly the binds it replaced; the original keybinds are saved in the plugin configuration so a restore still works after the client restarts.</Description>
+    <Tags>keybind;movement;chat;input;utility</Tags>
+    <RepoUrl>https://github.com/priestkos/KeyLock</RepoUrl>
+  </PropertyGroup>
+
+  <!-- tests/ holds the standalone offline harness; it must never be compiled into the plugin. -->
+  <ItemGroup>
+    <Compile Remove="tests/**" />
+    <None Remove="tests/**" />
+  </ItemGroup>
+
+</Project>

@@ -90,5 +90,69 @@ Check("name-up", KeyMap.Name(Up) == "Up", KeyMap.Name(Up));
 Check("name-unbound", KeyMap.Name(NoKey) == "unbound", KeyMap.Name(NoKey));
 Check("name-other", KeyMap.Name(F1) == "vk112", KeyMap.Name(F1));
 
+// --- Snapshot/restore state machine over a fake bind table (11-byte Keybinds, keyed by InputId). ---
+const int Shift = 0x01;
+const int MoveFore = 321, Jump = 348;
+byte[] Bind(int key, int mod = 0, int alt = 0, int altMod = 0) =>
+    [(byte)key, (byte)mod, (byte)alt, (byte)altMod, 0xA1, 0xA2, 0xA3, 0xA4, 0, 0, 0];
+
+Dictionary<int, byte[]> Table() => new() { [MoveFore] = Bind(W), [Jump] = Bind(Space, Shift) };
+Func<int, byte[]?> Reader(Dictionary<int, byte[]> table) => id => table.TryGetValue(id, out var b) ? (byte[])b.Clone() : null;
+Action<int, byte[]> Writer(Dictionary<int, byte[]> table) => (id, b) => table[id] = (byte[])b.Clone();
+int[] ids = [MoveFore, Jump];
+const ulong CharA = 1, CharB = 2;
+
+// Swap writes arrows and clears Jump's Space together with its Shift modifier; gamepad bytes untouched.
+var state = new Dictionary<ulong, Dictionary<int, byte[]>>();
+var tableA = Table();
+var swapped = KeyMap.Swap(state, CharA, ids, Reader(tableA), Writer(tableA));
+Check("swap-count", swapped == 2, $"{swapped}");
+Check("swap-fore", tableA[MoveFore][0] == Up, $"{tableA[MoveFore][0]}");
+Check("swap-nokey-clears-modifier", tableA[Jump][0] == NoKey && tableA[Jump][1] == 0, $"{tableA[Jump][0]}/{tableA[Jump][1]}");
+Check("swap-gamepad-untouched", tableA[Jump].Skip(4).SequenceEqual(Table()[Jump].Skip(4)), "gamepad bytes changed");
+Check("swap-snapshot", state[CharA][Jump].SequenceEqual(Table()[Jump]), "snapshot is not the pre-swap bind");
+
+// On while swapped: refused, nothing written, snapshot kept (a second swap would save the swapped layout).
+var before = tableA[MoveFore].ToArray();
+Check("on-while-swapped", KeyMap.Swap(state, CharA, ids, Reader(tableA), Writer(tableA)) == null
+    && tableA[MoveFore].SequenceEqual(before) && state[CharA][MoveFore][0] == W, "second swap acted");
+
+// Per-character isolation: B's state is its own, and B's restore never touches A's snapshot.
+var tableB = new Dictionary<int, byte[]> { [MoveFore] = Bind(W), [Jump] = Bind(Q) };
+Check("isolation-off-other-char", KeyMap.Restore(state, CharB, Reader(tableB), Writer(tableB)) == null
+    && tableB[MoveFore][0] == W && state.ContainsKey(CharA), "B restored A's snapshot");
+KeyMap.Swap(state, CharB, ids, Reader(tableB), Writer(tableB));
+Check("isolation-swap-b", state[CharB].Count == 1 && tableB[Jump][0] == Q && state[CharA].Count == 2, "B swap leaked");
+
+// Restore only writes back binds still holding what the swap wrote; gamepad bytes keep their live value.
+tableA[Jump] = Bind(F1, 0, 0, 0);                    // user rebound Jump himself after the swap
+tableA[MoveFore][5] = 0x55;                          // gamepad changed since the swap
+var result = KeyMap.Restore(state, CharA, Reader(tableA), Writer(tableA));
+Check("restore-count", result is { Restored: 1 } r1 && r1.Skipped.SequenceEqual([Jump]), $"{result}");
+Check("restore-skip-foreign", tableA[Jump][0] == F1, $"{tableA[Jump][0]}");
+Check("restore-keyboard", tableA[MoveFore][0] == W && tableA[MoveFore][1] == 0, $"{tableA[MoveFore][0]}");
+Check("restore-keeps-gamepad", tableA[MoveFore][5] == 0x55, $"{tableA[MoveFore][5]}");
+Check("restore-forgets", !state.ContainsKey(CharA) && state.ContainsKey(CharB), "state not cleared per character");
+
+// Off with no state: nothing written.
+Check("off-no-state", KeyMap.Restore(state, CharA, Reader(tableA), Writer(tableA)) == null, "restored with no state");
+
+// Ids the reader refuses (unknown to the plugin) are skipped and reported, never written.
+var bogus = new Dictionary<ulong, Dictionary<int, byte[]>> { [CharA] = new() { [99999] = Bind(W) } };
+var writes = 0;
+var bogusResult = KeyMap.Restore(bogus, CharA, _ => null, (_, _) => writes++);
+Check("restore-unknown-id", writes == 0 && bogusResult is { Restored: 0 } r2 && r2.Skipped.SequenceEqual([99999]), $"{bogusResult}");
+
+// Legacy global snapshot: adopted only when the live binds equal the swapped layout, including the
+// older build's Shift+NoKey leftover on Jump.
+var legacy = new Dictionary<int, byte[]> { [MoveFore] = Bind(W), [Jump] = Bind(Space, Shift) };
+var legacyLive = new Dictionary<int, byte[]> { [MoveFore] = Bind(Up), [Jump] = Bind(NoKey, Shift) };
+Check("legacy-matches", KeyMap.LegacyMatches(legacy, Reader(legacyLive)), "swapped layout not recognised");
+Check("legacy-other-char", !KeyMap.LegacyMatches(legacy, Reader(Table())), "unswapped character adopted it");
+Check("legacy-empty", !KeyMap.LegacyMatches([], Reader(legacyLive)), "empty legacy adopted");
+
+// Snapshot of the wrong size is never swapped or restored.
+Check("bad-size", KeyMap.Swapped(new byte[4]) == null && KeyMap.Restored(Bind(Up), new byte[4]) == null, "short bind used");
+
 Console.WriteLine($"{checks - failures}/{checks} checks passed.");
 return failures == 0 ? 0 : 1;

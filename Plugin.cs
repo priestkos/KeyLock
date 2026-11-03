@@ -84,9 +84,8 @@ public sealed unsafe class Plugin : IDalamudPlugin
     /// <summary>Checks a character is logged in and the layout matches, then migrates any legacy global swap.</summary>
     private bool TryBegin(out ulong character)
     {
-        // UIInputData exists at the title and character select too, where there are no character binds.
         character = PlayerState.ContentId;
-        if (!ClientState.IsLoggedIn || !PlayerState.IsLoaded || character == 0 || UIInputData.Instance() == null)
+        if (!KeyMap.CanTouchBinds(ClientState.IsLoggedIn, PlayerState.IsLoaded, character, UIInputData.Instance() != null))
         {
             ChatGui.Print("[KeyLock] not logged in.");
             return false;

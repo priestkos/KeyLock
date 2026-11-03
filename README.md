@@ -112,15 +112,15 @@ what the swap wrote, and only its keyboard bytes; a bind changed since then is l
 
 ## Tests
 
-53 offline checks over the mapping decision: every remap, that remapping is idempotent, that Q/E,
+58 offline checks over the mapping decision: every remap, that remapping is idempotent, that Q/E,
 Enter, NumPad0 and F1 are left alone, that a default keyboard loadout changes exactly five inputs, and
 that no two movement inputs land on the same arrow; and over the swap/restore state: per-character
 isolation, no second swap while swapped, restore skipping a bind changed after the swap, gamepad bytes
-kept, modifier cleared with Space, and adopting a pre-per-character snapshot only on a matching
+kept, modifier cleared with Space, the logged-in gate, and adopting a pre-per-character snapshot only on a matching
 character. No Dalamud, no dev distribution, no game.
 
 ```
-dotnet run --project tests/KeyLock.Tests.csproj -c Release    # 53/53 checks passed
+dotnet run --project tests/KeyLock.Tests.csproj -c Release    # 58/58 checks passed
 ```
 
 ## Limits

@@ -158,6 +158,13 @@ internal static class KeyMap
     public static bool LegacyMatches(Dictionary<int, byte[]> legacy, Func<int, byte[]?> read) =>
         legacy.Count > 0 && legacy.All(p => read(p.Key) is { } live && StillSwapped(live, p.Value));
 
+    /// <summary>
+    /// Binds may be read or written only for a loaded, logged-in character. The input table alone is not
+    /// enough: it exists at the title screen and character select too, where there are no character binds.
+    /// </summary>
+    public static bool CanTouchBinds(bool loggedIn, bool playerLoaded, ulong contentId, bool hasInputTable) =>
+        loggedIn && playerLoaded && contentId != 0 && hasInputTable;
+
     /// <summary>Short readable name for a bound key, used by the status line.</summary>
     public static string Name(int key) => key switch
     {

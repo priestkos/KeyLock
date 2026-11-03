@@ -154,5 +154,12 @@ Check("legacy-empty", !KeyMap.LegacyMatches([], Reader(legacyLive)), "empty lega
 // Snapshot of the wrong size is never swapped or restored.
 Check("bad-size", KeyMap.Swapped(new byte[4]) == null && KeyMap.Restored(Bind(Up), new byte[4]) == null, "short bind used");
 
+// Logged-in gate: title screen / character select have the input table but no character.
+Check("gate-title-screen", !KeyMap.CanTouchBinds(false, false, 0, true), "title screen allowed");
+Check("gate-char-select", !KeyMap.CanTouchBinds(false, true, CharA, true), "character select allowed");
+Check("gate-no-content-id", !KeyMap.CanTouchBinds(true, true, 0, true), "content id 0 allowed");
+Check("gate-no-input", !KeyMap.CanTouchBinds(true, true, CharA, false), "missing input table allowed");
+Check("gate-logged-in", KeyMap.CanTouchBinds(true, true, CharA, true), "logged-in character refused");
+
 Console.WriteLine($"{checks - failures}/{checks} checks passed.");
 return failures == 0 ? 0 : 1;

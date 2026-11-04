@@ -7,6 +7,8 @@ they were — so typing in chat can never walk you into a wall.
 
 `/keylock` · Dalamud API 15 · .NET 10
 
+> **No support will be provided. This software is to be used as is, without warranty of any kind.**
+
 ## Screenshots
 
 These images are **mock-ups** (HTML rendered to PNG). They are not real in-game captures and do not show the actual FFXIV client UI.

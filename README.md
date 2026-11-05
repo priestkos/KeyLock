@@ -15,7 +15,7 @@ These images are **mock-ups** (HTML rendered to PNG). They are not real in-game 
 
 | | |
 | --- | --- |
-| ![Config state mock-up](docs/screenshots/01-config-state.png) | **Saved configuration** — no settings window; `Swapped` and saved original keybind bytes live in `pluginConfigs/KeyLock.json`. |
+| ![Config state mock-up](docs/screenshots/01-config-state.png) | **Saved configuration** — no settings window; per-character swap snapshots live under `Characters` in `pluginConfigs/KeyLock.json`. |
 | ![Chat typing mock-up](docs/screenshots/02-chat-typing.png) | **Why swap** — with default WASD binds, typing those letters in chat can still move the character (the plugin rebinds the table; it does not block keys). |
 | ![Keybinds before mock-up](docs/screenshots/03-keybinds-before.png) | **Before `/keylock`** — illustrative Keybinds excerpt with W/A/S/D and Space on movement and Jump. |
 | ![Keybinds after mock-up](docs/screenshots/04-keybinds-after.png) | **After `/keylock`** — movement on arrow keys, Jump unbound; Q/E strafes unchanged. |
@@ -25,7 +25,7 @@ These images are **mock-ups** (HTML rendered to PNG). They are not real in-game 
 
 A short **mock-up** walkthrough (not real gameplay) cross-fades through the same scenes with on-screen captions. The gold **Mock-up** label stays visible for the whole clip.
 
-- [mockup-walkthrough.mp4](docs/videos/mockup-walkthrough.mp4) (H.264, 1280×720, ~18 s)
+- [mockup-walkthrough.mp4](docs/videos/mockup-walkthrough.mp4) (H.264, 1280×720, ~15 s)
 - [mockup-walkthrough.gif](docs/videos/mockup-walkthrough.gif) (preview)
 
 ## What it does

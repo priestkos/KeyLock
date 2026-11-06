@@ -1,14 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="104" fill="#3A5A7A"/>
-  <rect x="96" y="140" width="320" height="240" rx="36" fill="#1E2836"/>
-  <rect x="120" y="164" width="272" height="192" rx="24" fill="#E8EEF4"/>
-  <rect x="148" y="192" width="64" height="64" rx="10" fill="#C5D0DC"/>
-  <rect x="228" y="192" width="64" height="64" rx="10" fill="#C5D0DC"/>
-  <rect x="308" y="192" width="64" height="64" rx="10" fill="#C5D0DC"/>
-  <rect x="188" y="276" width="136" height="64" rx="10" fill="#C5D0DC"/>
-  <circle cx="368" cy="128" r="52" fill="#2A3848"/>
-  <circle cx="368" cy="128" r="36" fill="#4A90C8"/>
-  <rect x="352" y="128" width="32" height="44" rx="8" fill="#2A3848"/>
-  <circle cx="368" cy="112" r="10" fill="#E8EEF4"/>
-  <path d="M348 168 Q368 188 388 168" fill="none" stroke="#E8EEF4" stroke-width="8" stroke-linecap="round"/>
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4A6E93"/><stop offset="1" stop-color="#283F58"/></linearGradient>
+<radialGradient id="sheen" cx=".5" cy=".18" r=".75"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<radialGradient id="halo"><stop offset="0" stop-color="#F7CD6E" stop-opacity=".45"/><stop offset="1" stop-color="#F7CD6E" stop-opacity="0"/></radialGradient>
+<filter id="drop" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#000" flood-opacity=".32"/></filter>
+</defs>
+<rect width="512" height="512" rx="104" fill="url(#bg)"/>
+<rect width="512" height="512" rx="104" fill="url(#sheen)"/>
+<rect x="5" y="5" width="502" height="502" rx="99" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="4"/>
+<g filter="url(#drop)">
+<rect x="88" y="190" width="336" height="252" rx="34" fill="#1F2B44"/>
+<rect x="220" y="214" width="72" height="68" rx="12" fill="#E8EEF4"/><text x="256" y="261" text-anchor="middle" font-size="36" fill="#1F2B44" font-family="Segoe UI, Arial, sans-serif" font-weight="800">W</text><rect x="136" y="296" width="72" height="68" rx="12" fill="#E8EEF4"/><text x="172" y="343" text-anchor="middle" font-size="36" fill="#1F2B44" font-family="Segoe UI, Arial, sans-serif" font-weight="800">A</text><rect x="220" y="296" width="72" height="68" rx="12" fill="#E8EEF4"/><text x="256" y="343" text-anchor="middle" font-size="36" fill="#1F2B44" font-family="Segoe UI, Arial, sans-serif" font-weight="800">S</text><rect x="304" y="296" width="72" height="68" rx="12" fill="#E8EEF4"/><text x="340" y="343" text-anchor="middle" font-size="36" fill="#1F2B44" font-family="Segoe UI, Arial, sans-serif" font-weight="800">D</text>
+<rect x="136" y="378" width="240" height="40" rx="12" fill="#C5D0DC"/>
+<path d="M352 128 V104 A30 30 0 0 1 412 104 V128" fill="none" stroke="#E8EEF4" stroke-width="16"/>
+<rect x="330" y="122" width="104" height="86" rx="18" fill="#E8AE45"/>
+<circle cx="382" cy="156" r="12" fill="#1F2B44"/><rect x="376" y="160" width="12" height="28" rx="4" fill="#1F2B44"/>
+</g>
 </svg>

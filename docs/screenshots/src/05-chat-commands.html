@@ -11,7 +11,7 @@
     <div class="mockup-banner">Mock-up</div>
     <div class="scene-label">/keylock toggle, on, off, restore, and status read-back</div>
 
-    <div class="chat-panel">
+    <div class="chat-panel" style="bottom: 60px; max-height: none">
       <div class="chat-line echo">&gt; /keylock</div>
       <div class="chat-line plugin">[KeyLock] swapped 5 keybind(s): movement is on the arrow keys, Jump has no key. /keylock off restores.</div>
       <div class="chat-line echo">&gt; /keylock status</div>
@@ -20,18 +20,21 @@
       <div class="chat-line plugin-dim">  MOVE_BACK        Down / unbound</div>
       <div class="chat-line plugin-dim">  MOVE_LEFT        Left / unbound</div>
       <div class="chat-line plugin-dim">  MOVE_RIGHT       Right / unbound</div>
+      <div class="chat-line plugin-dim">  MOVE_STRIFE_L    vk81 / unbound</div>
+      <div class="chat-line plugin-dim">  MOVE_STRIFE_R    vk69 / unbound</div>
+      <div class="chat-line plugin-dim">  MOVE_AND_STEER   unbound / unbound</div>
       <div class="chat-line plugin-dim">  JUMP             unbound / unbound</div>
       <div class="chat-line echo">&gt; /keylock off</div>
       <div class="chat-line plugin">[KeyLock] restored 5 keybind(s).</div>
       <div class="chat-line echo">&gt; /keylock help</div>
       <div class="chat-line plugin">[KeyLock] /keylock [on|off|restore|status]</div>
     </div>
-    <div class="chat-input-hint">Illustrative chat lines — not a real client log</div>
+    <div class="chat-input-hint" style="bottom: 40px">Illustrative chat lines — not a real client log</div>
 
     <div class="callout" style="top: 100px; right: 48px">
       Bare <strong>/keylock</strong> toggles swap/restore for the logged-in character.<br />
       <strong>status</strong> prints swapped vs normal, the saved count, and the eight managed inputs.<br />
-      Unknown args print usage only — no chat echo for <strong>on</strong>/<strong>off</strong>.
+      Any other argument prints the usage line.
     </div>
   </body>
 </html>

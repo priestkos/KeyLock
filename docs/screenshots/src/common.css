@@ -104,6 +104,7 @@ body {
 
 .chat-line.plugin-dim {
   color: #9ec89e;
+  white-space: pre;
   padding-left: 2px;
 }
 

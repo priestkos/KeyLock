@@ -42,6 +42,9 @@ jobs:
           Invoke-WebRequest -UseBasicParsing -Uri 'https://goatcorp.github.io/dalamud-distrib/latest.zip' -OutFile dalamud.zip
           Expand-Archive -Path dalamud.zip -DestinationPath $dest -Force
 
+      - name: Run the offline checks
+        run: dotnet run --project tests/KeyLock.Tests.csproj -c Release
+
       - name: Resolve automatic release version
         id: auto_release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -162,9 +165,10 @@ jobs:
           Add-Type -AssemblyName System.IO.Compression.FileSystem
           $archive = [System.IO.Compression.ZipFile]::OpenRead($zip.FullName)
           try {
-            $dll = $archive.Entries | Where-Object { $_.Name -like '*.dll' } | Select-Object -First 1
-            if (-not $dll) { throw 'No plugin DLL in latest.zip' }
-            $manifestName = [System.IO.Path]::ChangeExtension($dll.Name, '.json')
+            $assemblyBase = 'KeyLock'
+            $dll = $archive.Entries | Where-Object { $_.Name -eq "$assemblyBase.dll" } | Select-Object -First 1
+            if (-not $dll) { throw "$assemblyBase.dll not in latest.zip" }
+            $manifestName = "$assemblyBase.json"
             $manifestEntry = $archive.GetEntry($manifestName)
             if (-not $manifestEntry) { throw "Manifest $manifestName not found in latest.zip" }
             $reader = New-Object System.IO.StreamReader($manifestEntry.Open())

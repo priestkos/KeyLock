@@ -187,6 +187,21 @@ try { KeyMap.Restore(crashState, CharA, Reader(crashTable), ThrowingWriter(crash
 Check("restore-throw-keeps-state", crashState.ContainsKey(CharA) && crashState[CharA][MoveFore][0] == W,
     "a failed restore forgot the originals");
 
+// Alt slot: Shift+Space there is cleared with its modifier; the primary and its modifier stay as they were.
+var altSwap = KeyMap.Swapped(Bind(E, Shift, Space, Shift));
+Check("swap-alt-slot", altSwap is [E, Shift, NoKey, 0, ..], altSwap == null ? "null" : string.Join(",", altSwap.Take(4)));
+
+// A moved key whose modifier the user changed after the swap is someone else's bind now: not restored.
+var modState = new Dictionary<ulong, Dictionary<int, byte[]>> { [CharA] = new() { [MoveFore] = Bind(W) } };
+var modTable = new Dictionary<int, byte[]> { [MoveFore] = Bind(Up, Shift) };
+var modResult = KeyMap.Restore(modState, CharA, Reader(modTable), Writer(modTable));
+Check("restore-skip-changed-modifier", modResult is { Restored: 0 } r3 && r3.Skipped.SequenceEqual([MoveFore])
+    && modTable[MoveFore][0] == Up, $"{modResult}");
+
+// Legacy snapshot with one bind the reader cannot see is not adopted (a partial match is not this character).
+Check("legacy-unreadable-id", !KeyMap.LegacyMatches(legacy, id => id == Jump ? null : Reader(legacyLive)(id)),
+    "adopted with an unreadable bind");
+
 // The originals reach the config file before the game sees any write.
 var persistState = new Dictionary<ulong, Dictionary<int, byte[]>>();
 var persistTable = Table();

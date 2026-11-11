@@ -36,17 +36,6 @@ internal static class KeyMap
         }
     }
 
-    /// <summary>
-    /// Rewrites one input's two keyboard binds. False when neither bind is a key this plugin moves,
-    /// so the caller leaves that input alone and stores no snapshot for it.
-    /// </summary>
-    public static bool TryRekey(int primary, int alt, out int newPrimary, out int newAlt)
-    {
-        var primaryMoved = TryRemap(primary, out newPrimary);
-        var altMoved = TryRemap(alt, out newAlt);
-        return primaryMoved || altMoved;
-    }
-
     // Keybind layout: KeySettings[0].{Key, Modifier}, KeySettings[1].{Key, Modifier} in bytes 0x00-0x03,
     // then the two gamepad settings and 3 spare bytes, which the swap never touches.
     public const int KeybindSize = 11;

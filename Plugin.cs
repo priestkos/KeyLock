@@ -50,8 +50,8 @@ public sealed unsafe class Plugin : IDalamudPlugin
 
     public void Dispose()
     {
-        PluginInterface.SavePluginConfig(this.configuration);
         CommandManager.RemoveHandler(CommandName);
+        this.Save();
     }
 
     private void OnCommand(string command, string args) => this.Handle(args.Trim().ToLowerInvariant());

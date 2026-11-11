@@ -39,21 +39,31 @@ foreach (var (key, name) in new[] { (Q, "Q"), (E, "E"), (Enter, "Enter"), (Num0,
         $"key {key} matched the map");
 }
 
-// One input's two keyboard binds are decided together.
-var rekeyed = KeyMap.TryRekey(W, 0, out var primary, out var alt);
-Check("rekey-primary", rekeyed && primary == Up && alt == 0, $"{primary}/{alt}");
+// One input's two keyboard binds are decided together, through the bind the swap actually writes.
+int[]? Rekey(int primary, int alt) => KeyMap.Swapped(Bind(primary, 0, alt)) is { } w ? [w[0], w[2]] : null;
+Check("rekey-primary", Rekey(W, 0) is [Up, 0], "W/none");
+Check("rekey-alt", Rekey(E, Space) is [E, NoKey], "E/Space");
+Check("rekey-both", Rekey(W, D) is [Up, Right], "W/D");
+Check("rekey-none", Rekey(Q, E) == null, "Q/E changed");
+Check("rekey-unbound", Rekey(0, 0) == null, "unbound changed");
 
-rekeyed = KeyMap.TryRekey(E, Space, out primary, out alt);
-Check("rekey-alt", rekeyed && primary == E && alt == NoKey, $"{primary}/{alt}");
+// Copy of the removed KeyMap.TryRekey (never called by the plugin); Swapped must decide every key pair the same.
+static bool OldTryRekey(int primary, int alt, out int newPrimary, out int newAlt)
+{
+    var primaryMoved = KeyMap.TryRemap(primary, out newPrimary);
+    var altMoved = KeyMap.TryRemap(alt, out newAlt);
+    return primaryMoved || altMoved;
+}
 
-rekeyed = KeyMap.TryRekey(W, D, out primary, out alt);
-Check("rekey-both", rekeyed && primary == Up && alt == Right, $"{primary}/{alt}");
-
-rekeyed = KeyMap.TryRekey(Q, E, out primary, out alt);
-Check("rekey-none", !rekeyed && primary == Q && alt == E, $"{primary}/{alt}");
-
-rekeyed = KeyMap.TryRekey(0, 0, out primary, out alt);
-Check("rekey-unbound", !rekeyed && primary == 0 && alt == 0, $"{primary}/{alt}");
+var rekeyMismatches = 0;
+for (var p = 0; p < 256; p++)
+for (var q = 0; q < 256; q++)
+{
+    var oldMoved = OldTryRekey(p, q, out var op, out var oq);
+    var now = Rekey(p, q);
+    if (oldMoved != (now != null) || (now != null && (now[0] != op || now[1] != oq))) rekeyMismatches++;
+}
+Check("rekey-old-vs-new-65536", rekeyMismatches == 0, $"{rekeyMismatches} of 65536 key pairs differ");
 
 // A default FFXIV keyboard loadout, as the plugin would see it: only the four movement binds and
 // Jump change; the Q/E strafes and the unbound "move and steer" input are left alone.
@@ -72,7 +82,7 @@ var loadout = new (string Id, int Primary, int Alt, bool ShouldChange)[]
 var changed = 0;
 foreach (var (id, boundPrimary, boundAlt, shouldChange) in loadout)
 {
-    var touched = KeyMap.TryRekey(boundPrimary, boundAlt, out _, out _);
+    var touched = Rekey(boundPrimary, boundAlt) != null;
     if (touched) changed++;
     Check($"loadout-{id}", touched == shouldChange, $"changed={touched}, expected {shouldChange}");
 }

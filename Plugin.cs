@@ -125,14 +125,12 @@ public sealed unsafe class Plugin : IDalamudPlugin
 
     private void Swap(ulong character)
     {
-        var changed = KeyMap.Swap(this.configuration.Characters, character, TargetIds.Select(id => (int)id), ReadBind, WriteBind);
+        var changed = KeyMap.Swap(this.configuration.Characters, character, TargetIds.Select(id => (int)id), ReadBind, WriteBind, this.Save);
         if (changed == null)
         {
             ChatGui.Print("[KeyLock] already swapped; /keylock off restores the original binds.");
             return;
         }
-
-        this.Save();
 
         ChatGui.Print(changed == 0
             ? "[KeyLock] nothing to swap: no movement or jump bind uses W, A, S, D or Space."

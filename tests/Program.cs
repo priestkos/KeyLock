@@ -105,7 +105,7 @@ const ulong CharA = 1, CharB = 2;
 // Swap writes arrows and clears Jump's Space together with its Shift modifier; gamepad bytes untouched.
 var state = new Dictionary<ulong, Dictionary<int, byte[]>>();
 var tableA = Table();
-var swapped = KeyMap.Swap(state, CharA, ids, Reader(tableA), Writer(tableA));
+var swapped = KeyMap.Swap(state, CharA, ids, Reader(tableA), Writer(tableA), () => { });
 Check("swap-count", swapped == 2, $"{swapped}");
 Check("swap-fore", tableA[MoveFore][0] == Up, $"{tableA[MoveFore][0]}");
 Check("swap-nokey-clears-modifier", tableA[Jump][0] == NoKey && tableA[Jump][1] == 0, $"{tableA[Jump][0]}/{tableA[Jump][1]}");
@@ -114,14 +114,14 @@ Check("swap-snapshot", state[CharA][Jump].SequenceEqual(Table()[Jump]), "snapsho
 
 // On while swapped: refused, nothing written, snapshot kept (a second swap would save the swapped layout).
 var before = tableA[MoveFore].ToArray();
-Check("on-while-swapped", KeyMap.Swap(state, CharA, ids, Reader(tableA), Writer(tableA)) == null
+Check("on-while-swapped", KeyMap.Swap(state, CharA, ids, Reader(tableA), Writer(tableA), () => { }) == null
     && tableA[MoveFore].SequenceEqual(before) && state[CharA][MoveFore][0] == W, "second swap acted");
 
 // Per-character isolation: B's state is its own, and B's restore never touches A's snapshot.
 var tableB = new Dictionary<int, byte[]> { [MoveFore] = Bind(W), [Jump] = Bind(Q) };
 Check("isolation-off-other-char", KeyMap.Restore(state, CharB, Reader(tableB), Writer(tableB)) == null
     && tableB[MoveFore][0] == W && state.ContainsKey(CharA), "B restored A's snapshot");
-KeyMap.Swap(state, CharB, ids, Reader(tableB), Writer(tableB));
+KeyMap.Swap(state, CharB, ids, Reader(tableB), Writer(tableB), () => { });
 Check("isolation-swap-b", state[CharB].Count == 1 && tableB[Jump][0] == Q && state[CharA].Count == 2, "B swap leaked");
 
 // Restore only writes back binds still holding what the swap wrote; gamepad bytes keep their live value.
@@ -160,6 +160,30 @@ Check("gate-char-select", !KeyMap.CanTouchBinds(false, true, CharA, true), "char
 Check("gate-no-content-id", !KeyMap.CanTouchBinds(true, true, 0, true), "content id 0 allowed");
 Check("gate-no-input", !KeyMap.CanTouchBinds(true, true, CharA, false), "missing input table allowed");
 Check("gate-logged-in", KeyMap.CanTouchBinds(true, true, CharA, true), "logged-in character refused");
+
+// A write that throws part-way must never lose a saved original: the swap records every original before
+// the first write, and a restore forgets the character only after all its writes went through.
+Action<int, byte[]> ThrowingWriter(Dictionary<int, byte[]> table, int failOn) => (id, b) =>
+{
+    if (id == failOn) throw new InvalidOperationException("write failed");
+    table[id] = (byte[])b.Clone();
+};
+var crashState = new Dictionary<ulong, Dictionary<int, byte[]>>();
+var crashTable = Table();
+try { KeyMap.Swap(crashState, CharA, ids, Reader(crashTable), ThrowingWriter(crashTable, Jump), () => { }); } catch (InvalidOperationException) { }
+Check("swap-throw-keeps-originals", crashState.TryGetValue(CharA, out var kept) && kept.Count == 2
+    && kept[MoveFore][0] == W && crashTable[MoveFore][0] == Up, "an original written to the game was not saved");
+try { KeyMap.Restore(crashState, CharA, Reader(crashTable), ThrowingWriter(crashTable, MoveFore)); } catch (InvalidOperationException) { }
+Check("restore-throw-keeps-state", crashState.ContainsKey(CharA) && crashState[CharA][MoveFore][0] == W,
+    "a failed restore forgot the originals");
+
+// The originals reach the config file before the game sees any write.
+var persistState = new Dictionary<ulong, Dictionary<int, byte[]>>();
+var persistTable = Table();
+var persistedBeforeWrite = false;
+KeyMap.Swap(persistState, CharA, ids, Reader(persistTable), Writer(persistTable), () =>
+    persistedBeforeWrite = persistState.TryGetValue(CharA, out var p) && p.Count == 2 && persistTable[MoveFore][0] == W);
+Check("swap-persists-before-write", persistedBeforeWrite && persistTable[MoveFore][0] == Up, "persist ran after a write");
 
 Console.WriteLine($"{checks - failures}/{checks} checks passed.");
 return failures == 0 ? 0 : 1;

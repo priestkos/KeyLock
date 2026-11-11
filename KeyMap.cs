@@ -104,23 +104,27 @@ internal static class KeyMap
     /// <summary>
     /// Swaps <paramref name="ids"/> for one character and saves each pre-swap bind under it. Null when that
     /// character is already swapped; otherwise the number of binds written. A character counts as swapped
-    /// while it has an entry in <paramref name="state"/>, even an empty one.
+    /// while it has an entry in <paramref name="state"/>, even an empty one. Every original is recorded and
+    /// <paramref name="persist"/> runs before the first write, so no write can outlive its saved original.
     /// </summary>
     public static int? Swap(Dictionary<ulong, Dictionary<int, byte[]>> state, ulong character, IEnumerable<int> ids,
-        Func<int, byte[]?> read, Action<int, byte[]> write)
+        Func<int, byte[]?> read, Action<int, byte[]> write, Action persist)
     {
         if (state.ContainsKey(character)) return null;
         var saved = new Dictionary<int, byte[]>();
+        var patches = new Dictionary<int, byte[]>();
         foreach (var id in ids)
         {
             var live = read(id);
             var patched = live == null ? null : Swapped(live);
             if (patched == null) continue;
             saved[id] = live!;
-            write(id, patched);
+            patches[id] = patched;
         }
 
         state[character] = saved;
+        persist();
+        foreach (var (id, patched) in patches) write(id, patched);
         return saved.Count;
     }
 
@@ -131,7 +135,7 @@ internal static class KeyMap
     public static (int Restored, List<int> Skipped)? Restore(Dictionary<ulong, Dictionary<int, byte[]>> state,
         ulong character, Func<int, byte[]?> read, Action<int, byte[]> write)
     {
-        if (!state.Remove(character, out var saved)) return null;
+        if (!state.TryGetValue(character, out var saved)) return null;
         var restored = 0;
         var skipped = new List<int>();
         foreach (var (id, original) in saved)
@@ -148,6 +152,7 @@ internal static class KeyMap
             restored++;
         }
 
+        state.Remove(character); // only once every write went through: a throw keeps the originals
         return (restored, skipped);
     }
 
